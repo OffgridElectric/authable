@@ -3,14 +3,14 @@ defmodule Authable.Repo.Migrations.CreateUser do
 
   def change do
     create table(:users, primary_key: false) do
-      add :id, :uuid, primary_key: true
-      add :email, :string
-      add :password, :string
-      add :settings, :jsonb
+      add(:id, :uuid, primary_key: true)
+      add(:email, :string)
+      add(:password, :string)
+      add(:settings, :jsonb)
 
       timestamps
     end
-    create unique_index(:users, [:email])
 
+    create(unique_index(:users, [:email]))
   end
 end

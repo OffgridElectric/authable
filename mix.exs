@@ -2,16 +2,18 @@ defmodule Authable.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :authable,
-     version: "0.4.0",
-     elixir: "~> 1.2",
-     elixirc_paths: elixirc_paths(Mix.env),
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     aliases: aliases,
-     description: description,
-     package: package,
-     deps: deps]
+    [
+      app: :authable,
+      version: "0.4.0",
+      elixir: "~> 1.2",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
+      description: description(),
+      package: package(),
+      deps: deps()
+    ]
   end
 
   # Configuration for the OTP application
@@ -20,7 +22,8 @@ defmodule Authable.Mixfile do
   def application do
     [
       mod: {Authable, []},
-      applications: [:logger, :comeonin, :ecto, :timex, :secure_random]
+      applications: [:logger, :comeonin, :ecto, :timex, :secure_random],
+      extra_applications: [:logger, :ecto_sql]
     ]
   end
 
@@ -36,9 +39,10 @@ defmodule Authable.Mixfile do
   defp deps do
     [
       {:postgrex, ">= 0.0.0"},
+      {:ecto_sql, "~> 3.12"},
       {:ecto, ">= 1.1.7"},
       {:comeonin, "~> 2.0"},
-      {:timex, "~> 2.1.4"},
+      {:timex, "~> 3.6"},
       {:secure_random, "~> 0.2"},
       {:ex_machina, "~> 0.6.1", only: :test},
       {:poison, "~> 2.1.0"},
@@ -65,10 +69,12 @@ defmodule Authable.Mixfile do
   end
 
   defp package do
-    [name: :authable,
-     files: ["lib", "web", "priv", "mix.exs", "README.md"],
-     maintainers: ["Mustafa Turan"],
-     licenses: ["MIT"],
-     links: %{"GitHub" => "https://github.com/mustafaturan/authable"}]
+    [
+      name: :authable,
+      files: ["lib", "web", "priv", "mix.exs", "README.md"],
+      maintainers: ["Mustafa Turan"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/mustafaturan/authable"}
+    ]
   end
 end

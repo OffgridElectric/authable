@@ -5,7 +5,7 @@ defmodule Authable.Rollbackable do
 
   use ExUnit.CaseTemplate
 
-  @repo Application.get_env(:authable, :repo)
+  @repo Application.compile_env!(:authable, :repo)
 
   using do
     quote do
@@ -17,9 +17,9 @@ defmodule Authable.Rollbackable do
     Ecto.Adapters.SQL.begin_test_transaction(@repo)
 
     # Roll it back once we are done
-    on_exit fn ->
+    on_exit(fn ->
       Ecto.Adapters.SQL.rollback_test_transaction(@repo)
-    end
+    end)
 
     :ok
   end

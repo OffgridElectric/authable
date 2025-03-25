@@ -5,12 +5,12 @@ defmodule Authable.OAuth2 do
 
   import Ecto.Query, only: [where: 2]
 
-  @repo Application.get_env(:authable, :repo)
-  @token_store Application.get_env(:authable, :token_store)
-  @client Application.get_env(:authable, :client)
-  @app Application.get_env(:authable, :app)
-  @strategies Application.get_env(:authable, :strategies)
-  @scopes Application.get_env(:authable, :scopes)
+  @repo Application.compile_env!(:authable, :repo)
+  @token_store Application.compile_env!(:authable, :token_store)
+  @client Application.compile_env!(:authable, :client)
+  @app Application.compile_env!(:authable, :app)
+  @strategies Application.compile_env!(:authable, :strategies)
+  @scopes Application.compile_env!(:authable, :scopes)
 
   def authorize(params) do
     strategy_check(params["grant_type"])
@@ -18,23 +18,32 @@ defmodule Authable.OAuth2 do
   end
 
   def authorize_app(user, params) do
-    client = @repo.get_by(@client, id: params["client_id"],
-                  redirect_uri: params["redirect_uri"])
+    client =
+      @repo.get_by(@client,
+        id: params["client_id"],
+        redirect_uri: params["redirect_uri"]
+      )
+
     if client do
       app = @repo.get_by(@app, user_id: user.id, client_id: params["client_id"])
+
       if is_nil(app) do
-        @repo.insert!(@app.changeset(%@app{}, %{
-          user_id: user.id,
-          client_id: params["client_id"],
-          scope: params["scope"]
-        }))
+        @repo.insert!(
+          @app.changeset(%@app{}, %{
+            user_id: user.id,
+            client_id: params["client_id"],
+            scope: params["scope"]
+          })
+        )
       else
         if app.scope != params["scope"] do
-          scope = params["scope"]
-          |> String.split(",")
-          |> Enum.concat(String.split(app.scope, ","))
-          |> Enum.uniq()
-          scope = @scopes -- (@scopes -- scope)
+          scope =
+            params["scope"]
+            |> String.split(",")
+            |> Enum.concat(String.split(app.scope, ","))
+            |> Enum.uniq()
+
+          scope = @scopes -- @scopes -- scope
           @repo.update!(@app.changeset(app, %{scope: Enum.join(scope, ",")}))
         else
           app
@@ -47,17 +56,17 @@ defmodule Authable.OAuth2 do
     app = @repo.get_by!(@app, id: params["id"], user_id: user.id)
     @repo.delete!(app)
 
-    tokens = @token_store
-    |> where(user_id: ^user.id)
-    |> @repo.all
+    tokens =
+      @token_store
+      |> where(user_id: ^user.id)
+      |> @repo.all
 
     Enum.map(tokens, fn token ->
-        if token.details &&
+      if token.details &&
            Map.get(token.details, "client_id", "") == app.client_id do
-          @repo.delete!(token)
-        end
+        @repo.delete!(token)
       end
-    )
+    end)
   end
 
   defp strategy_check(grant_type) do

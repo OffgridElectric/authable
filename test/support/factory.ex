@@ -3,11 +3,11 @@ defmodule Authable.Factory do
   Generates factories
   """
 
-  @repo Application.get_env(:authable, :repo)
-  @resource_owner Application.get_env(:authable, :resource_owner)
-  @token_store Application.get_env(:authable, :token_store)
-  @client Application.get_env(:authable, :client)
-  @app Application.get_env(:authable, :app)
+  @repo Application.compile_env!(:authable, :repo)
+  @resource_owner Application.compile_env!(:authable, :resource_owner)
+  @token_store Application.compile_env!(:authable, :token_store)
+  @client Application.compile_env!(:authable, :client)
+  @app Application.compile_env!(:authable, :app)
 
   use ExMachina.Ecto, repo: @repo
 
@@ -22,7 +22,7 @@ defmodule Authable.Factory do
     %@client{
       user: build(:user),
       name: sequence(:name, &"client#{&1}"),
-      secret: SecureRandom.urlsafe_base64,
+      secret: SecureRandom.urlsafe_base64(),
       redirect_uri: "https://example.com/oauth2-redirect-path",
       settings: %{
         name: "example",

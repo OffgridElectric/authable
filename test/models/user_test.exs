@@ -15,16 +15,22 @@ defmodule Authable.Models.UserTest do
   end
 
   test "changeset, email too short" do
-    changeset = @resource_owner.changeset(
-      %@resource_owner{}, Map.put(@valid_attrs, :email, "")
-    )
+    changeset =
+      @resource_owner.changeset(
+        %@resource_owner{},
+        Map.put(@valid_attrs, :email, "")
+      )
+
     refute changeset.valid?
   end
 
   test "changeset, email invalid format" do
-    changeset = @resource_owner.changeset(
-      %@resource_owner{}, Map.put(@valid_attrs, :email, "foo.com")
-    )
+    changeset =
+      @resource_owner.changeset(
+        %@resource_owner{},
+        Map.put(@valid_attrs, :email, "foo.com")
+      )
+
     refute changeset.valid?
   end
 
@@ -34,16 +40,22 @@ defmodule Authable.Models.UserTest do
   end
 
   test "registration_changeset, password too short" do
-    changeset = @resource_owner.registration_changeset(
-      %@resource_owner{}, Map.put(@valid_attrs, :password, "1234567")
-    )
+    changeset =
+      @resource_owner.registration_changeset(
+        %@resource_owner{},
+        Map.put(@valid_attrs, :password, "1234567")
+      )
+
     refute changeset.valid?
   end
 
   test "settings_changeset with valid attributes" do
-    changeset = @resource_owner.settings_changeset(
-      %@resource_owner{}, %{settings: %{language: "tr"}}
-    )
+    changeset =
+      @resource_owner.settings_changeset(
+        %@resource_owner{},
+        %{settings: %{language: "tr"}}
+      )
+
     assert changeset.valid?
   end
 end

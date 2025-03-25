@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :authable, Authable.Repo,
   adapter: Ecto.Adapters.Postgres,

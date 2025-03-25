@@ -18,10 +18,14 @@ defmodule Authable.OAuth2Test do
   test "resource_owner authorize app for a client" do
     resource_owner = create(:user)
     client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
-                    redirect_uri: @redirect_uri)
-    params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri,
-               "scope" => @scopes}
+
+    client =
+      create(:client,
+        user_id: client_owner.id,
+        redirect_uri: @redirect_uri
+      )
+
+    params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri, "scope" => @scopes}
     app = OAuth2.authorize_app(resource_owner, params)
     refute is_nil(app)
   end
@@ -30,13 +34,16 @@ defmodule Authable.OAuth2Test do
     new_scopes = "read,write"
     resource_owner = create(:user)
     client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
-                    redirect_uri: @redirect_uri)
-    app = create(:app, user_id: resource_owner.id, client_id: client.id,
-                 scope: @scopes)
 
-    params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri,
-               "scope" => new_scopes}
+    client =
+      create(:client,
+        user_id: client_owner.id,
+        redirect_uri: @redirect_uri
+      )
+
+    app = create(:app, user_id: resource_owner.id, client_id: client.id, scope: @scopes)
+
+    params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri, "scope" => new_scopes}
     same_app = OAuth2.authorize_app(resource_owner, params)
     assert app.id == same_app.id
     assert same_app.scope == new_scopes
@@ -45,13 +52,16 @@ defmodule Authable.OAuth2Test do
   test "resource_owner re-authorize app with old scopes for a client" do
     resource_owner = create(:user)
     client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
-                    redirect_uri: @redirect_uri)
-    app = create(:app, user_id: resource_owner.id, client_id: client.id,
-                 scope: @scopes)
 
-    params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri,
-               "scope" => @scopes}
+    client =
+      create(:client,
+        user_id: client_owner.id,
+        redirect_uri: @redirect_uri
+      )
+
+    app = create(:app, user_id: resource_owner.id, client_id: client.id, scope: @scopes)
+
+    params = %{"client_id" => client.id, "redirect_uri" => @redirect_uri, "scope" => @scopes}
     same_app = OAuth2.authorize_app(resource_owner, params)
     assert app.id == same_app.id
     assert same_app.scope == @scopes
@@ -60,30 +70,55 @@ defmodule Authable.OAuth2Test do
   test "does not allow to change redirect_uri when authorize app" do
     resource_owner = create(:user)
     client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
-                    redirect_uri: @redirect_uri)
-    params = %{"client_id" => client.id, "redirect_uri" => "https://xyz.com/nx",
-               "scope" => @scopes}
+
+    client =
+      create(:client,
+        user_id: client_owner.id,
+        redirect_uri: @redirect_uri
+      )
+
+    params = %{
+      "client_id" => client.id,
+      "redirect_uri" => "https://xyz.com/nx",
+      "scope" => @scopes
+    }
+
     assert is_nil(OAuth2.authorize_app(resource_owner, params))
   end
 
   test "deletes app and user's all client tokens" do
     resource_owner = create(:user)
     client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id,
-                    redirect_uri: @redirect_uri)
-    app = create(:app, user_id: resource_owner.id, client_id: client.id,
-                 scope: @scopes)
-    create(:access_token, user_id: resource_owner.id, details: %{
-      client_id: client.id
-    })
-    create(:refresh_token, user_id: resource_owner.id, details: %{
-      client_id: client.id
-    })
+
+    client =
+      create(:client,
+        user_id: client_owner.id,
+        redirect_uri: @redirect_uri
+      )
+
+    app = create(:app, user_id: resource_owner.id, client_id: client.id, scope: @scopes)
+
+    create(:access_token,
+      user_id: resource_owner.id,
+      details: %{
+        client_id: client.id
+      }
+    )
+
+    create(:refresh_token,
+      user_id: resource_owner.id,
+      details: %{
+        client_id: client.id
+      }
+    )
+
     OAuth2.revoke_app_authorization(resource_owner, %{"id" => app.id})
-    tokens = @token_store
-    |> where(user_id: ^resource_owner.id)
-    |> @repo.all
+
+    tokens =
+      @token_store
+      |> where(user_id: ^resource_owner.id)
+      |> @repo.all
+
     assert Enum.count(tokens) == 0
     assert is_nil(@repo.get(@app, app.id))
   end

@@ -5,8 +5,8 @@ defmodule Authable.Authentications.Basic do
 
   alias Authable.Utils.Crypt, as: CryptUtil
 
-  @repo Application.get_env(:authable, :repo)
-  @resource_owner Application.get_env(:authable, :resource_owner)
+  @repo Application.compile_env!(:authable, :repo)
+  @resource_owner Application.compile_env!(:authable, :resource_owner)
 
   def authenticate(auth_credentials) do
     {:ok, credentials} = Base.decode64(auth_credentials)

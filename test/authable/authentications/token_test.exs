@@ -15,14 +15,22 @@ defmodule Authable.Authentications.TokenTest do
   end
 
   test "authorize with bearer token" do
-    authorized_user = TokenAuthentication.authenticate("access_token",
-      @access_token_value)
+    authorized_user =
+      TokenAuthentication.authenticate(
+        "access_token",
+        @access_token_value
+      )
+
     refute is_nil(authorized_user)
   end
 
   test "authorize with session token" do
-    authorized_user = TokenAuthentication.authenticate("session_token",
-      @session_token_value)
+    authorized_user =
+      TokenAuthentication.authenticate(
+        "session_token",
+        @session_token_value
+      )
+
     refute is_nil(authorized_user)
   end
 end

@@ -8,8 +8,8 @@ defmodule Authable.Models.Token do
   alias Timex.Time
   alias Authable.Utils.Crypt, as: CryptUtil
 
-  @resource_owner Application.get_env(:authable, :resource_owner)
-  @expires_in Application.get_env(:authable, :expires_in)
+  @resource_owner Application.compile_env!(:authable, :resource_owner)
+  @expires_in Application.compile_env!(:authable, :expires_in)
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -21,7 +21,7 @@ defmodule Authable.Models.Token do
     field :details, :map
     belongs_to :user, @resource_owner
 
-    timestamps
+    timestamps()
   end
 
   @required_fields ~w(user_id)

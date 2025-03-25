@@ -7,9 +7,9 @@ defmodule Authable.Models.User do
   import Ecto.Changeset
   alias Authable.Utils.Crypt, as: CryptUtil
 
-  @token_store Application.get_env(:authable, :token_store)
-  @client Application.get_env(:authable, :client)
-  @app Application.get_env(:authable, :app)
+  @token_store Application.compile_env!(:authable, :token_store)
+  @client Application.compile_env!(:authable, :client)
+  @app Application.compile_env!(:authable, :app)
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
@@ -21,10 +21,10 @@ defmodule Authable.Models.User do
     has_many :tokens, @token_store
     has_many :apps, @app
 
-    timestamps
+    timestamps()
   end
 
-  @required_fields ~w(email password)
+  # @required_fields ~w(email password)
   @optional_fields ~w(settings)
 
   @doc """

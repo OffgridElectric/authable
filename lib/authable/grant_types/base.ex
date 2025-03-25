@@ -3,10 +3,10 @@ defmodule Authable.GrantTypes.Base do
   Base module for OAuth2 grant types
   """
 
-  @repo Application.get_env(:authable, :repo)
-  @token_store Application.get_env(:authable, :token_store)
-  @app Application.get_env(:authable, :app)
-  @strategies Application.get_env(:authable, :strategies)
+  @repo Application.compile_env!(:authable, :repo)
+  @token_store Application.compile_env!(:authable, :token_store)
+  @app Application.compile_env!(:authable, :app)
+  @strategies Application.compile_env!(:authable, :strategies)
 
   def authorize(_params) do
     raise Authable.NotImplementedError, message: "Not implemented!"
@@ -27,21 +27,28 @@ defmodule Authable.GrantTypes.Base do
 
     if @strategies[:refresh_token] do
       # create refresh_token
-      refresh_token_changeset = @token_store.refresh_token_changeset(
-        %@token_store{}, token_params
-      )
+      refresh_token_changeset =
+        @token_store.refresh_token_changeset(
+          %@token_store{},
+          token_params
+        )
+
       case @repo.insert(refresh_token_changeset) do
         {:ok, refresh_token} ->
-          token_params = token_params |> Map.merge(%{details:
-            Map.put(token_params[:details],
-              :refresh_token, refresh_token.value)}
-          )
+          _token_params =
+            token_params
+            |> Map.merge(%{
+              details: Map.put(token_params[:details], :refresh_token, refresh_token.value)
+            })
       end
     end
 
-    access_token_changeset = @token_store.access_token_changeset(
-      %@token_store{}, token_params
-    )
+    access_token_changeset =
+      @token_store.access_token_changeset(
+        %@token_store{},
+        token_params
+      )
+
     case @repo.insert(access_token_changeset) do
       {:ok, access_token} -> access_token
     end
@@ -54,7 +61,7 @@ defmodule Authable.GrantTypes.Base do
   defp scopes_check(scopes) do
     valid_scopes = Application.get_env(:authable, :scopes)
     desired_scopes = String.split(scopes, ",")
-    Enum.each(desired_scopes, fn(scope) -> scope_check(valid_scopes, scope) end)
+    Enum.each(desired_scopes, fn scope -> scope_check(valid_scopes, scope) end)
   end
 
   defp scope_check(valid_scopes, scope) do

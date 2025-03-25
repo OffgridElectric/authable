@@ -5,7 +5,7 @@ defmodule Authable do
 
   use Application
 
-  @repo Application.get_env(:authable, :repo)
+  @repo Application.compile_env!(:authable, :repo)
 
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
