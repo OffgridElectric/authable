@@ -29,7 +29,7 @@ defmodule Authable.GrantTypes.Base do
       # create refresh_token
       refresh_token_changeset =
         @token_store.refresh_token_changeset(
-          %@token_store{},
+          struct(@token_store),
           token_params
         )
 
@@ -45,7 +45,7 @@ defmodule Authable.GrantTypes.Base do
 
     access_token_changeset =
       @token_store.access_token_changeset(
-        %@token_store{},
+        struct(@token_store),
         token_params
       )
 

@@ -42,6 +42,6 @@ defmodule Authable.Models.Client do
   end
 
   defp put_secret(model_changeset) do
-    put_change(model_changeset, :secret, CryptUtil.generate_token)
+    put_change(model_changeset, :secret, CryptUtil.generate_token())
   end
 end

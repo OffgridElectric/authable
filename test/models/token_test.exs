@@ -9,7 +9,7 @@ defmodule Authable.Models.TokenTest do
 
   test "changeset with valid attributes", %{user: user} do
     changeset =
-      @token_store.changeset(%@token_store{}, %{
+      @token_store.changeset(struct(@token_store), %{
         user_id: user.id,
         details: %{grant_type: "unknown"}
       })
@@ -19,13 +19,13 @@ defmodule Authable.Models.TokenTest do
   end
 
   test "changeset with invalid attributes" do
-    changeset = @token_store.changeset(%@token_store{}, %{user_id: 123_456})
+    changeset = @token_store.changeset(struct(@token_store), %{user_id: 123_456})
     refute changeset.valid?
   end
 
   test "authorization_code_changeset", %{user: user} do
     changeset =
-      @token_store.authorization_code_changeset(%@token_store{}, %{
+      @token_store.authorization_code_changeset(struct(@token_store), %{
         user_id: user.id,
         details: %{grant_type: "authorization_code"}
       })
@@ -37,7 +37,7 @@ defmodule Authable.Models.TokenTest do
 
   test "refresh_token_changeset", %{user: user} do
     changeset =
-      @token_store.refresh_token_changeset(%@token_store{}, %{
+      @token_store.refresh_token_changeset(struct(@token_store), %{
         user_id: user.id,
         details: %{grant_type: "authorization_code"}
       })
@@ -49,7 +49,7 @@ defmodule Authable.Models.TokenTest do
 
   test "access_token_changeset", %{user: user} do
     changeset =
-      @token_store.access_token_changeset(%@token_store{}, %{
+      @token_store.access_token_changeset(struct(@token_store), %{
         user_id: user.id,
         details: %{grant_type: "authorization_code"}
       })
@@ -61,7 +61,7 @@ defmodule Authable.Models.TokenTest do
 
   test "session_token_changeset", %{user: user} do
     changeset =
-      @token_store.session_token_changeset(%@token_store{}, %{
+      @token_store.session_token_changeset(struct(@token_store), %{
         user_id: user.id,
         details: %{grant_type: "openid"}
       })

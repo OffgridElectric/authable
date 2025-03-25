@@ -29,7 +29,7 @@ defmodule Authable.OAuth2 do
 
       if is_nil(app) do
         @repo.insert!(
-          @app.changeset(%@app{}, %{
+          @app.changeset(struct(@app), %{
             user_id: user.id,
             client_id: params["client_id"],
             scope: params["scope"]

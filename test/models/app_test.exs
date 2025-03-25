@@ -11,7 +11,7 @@ defmodule Authable.Models.AppTest do
 
   test "changeset with valid attributes", %{user_id: user_id, client_id: client_id} do
     changeset =
-      @app.changeset(%@app{}, %{
+      @app.changeset(struct(@app), %{
         scope: "read,write",
         client_id: client_id,
         user_id: user_id

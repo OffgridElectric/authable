@@ -9,7 +9,7 @@ defmodule Authable.Models.ClientTest do
 
   test "changeset with valid attributes", %{user_id: user_id} do
     changeset =
-      @client.changeset(%@client{}, %{
+      @client.changeset(struct(@client), %{
         user_id: user_id,
         name: "ResourceServer",
         redirect_uri: "https://example.com/oauth2_callback",

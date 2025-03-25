@@ -37,8 +37,10 @@ defmodule Authable.Models.User do
     model
     |> cast(params, ~w(email), @optional_fields)
     |> validate_length(:email, min: 6, max: 255)
-    |> validate_format(:email,
-         ~r/\A([\w+\-]\.?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i)
+    |> validate_format(
+      :email,
+      ~r/\A([\w+\-]\.?)+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
+    )
   end
 
   def settings_changeset(model, params \\ :empty) do
@@ -59,9 +61,9 @@ defmodule Authable.Models.User do
     case model_changeset do
       %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
         put_change(model_changeset, :password, CryptUtil.salt_password(pass))
+
       _ ->
         model_changeset
     end
   end
-
 end

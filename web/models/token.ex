@@ -73,7 +73,7 @@ defmodule Authable.Models.Token do
   end
 
   defp put_token_value(model_changeset) do
-    put_change(model_changeset, :value, CryptUtil.generate_token)
+    put_change(model_changeset, :value, CryptUtil.generate_token())
   end
 
   defp put_token_name(model_changeset, name) do
