@@ -6,11 +6,11 @@ defmodule Authable.Utils.Crypt do
   alias Comeonin.Bcrypt
 
   def match_password(password, crypted_password) do
-    Bcrypt.checkpw(password, crypted_password)
+    Bcrypt.verify_pass(password, crypted_password)
   end
 
   def salt_password(password) do
-    Bcrypt.hashpwsalt(password)
+    Bcrypt.hash_pwd_salt(password)
   end
 
   def generate_token do

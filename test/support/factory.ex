@@ -14,7 +14,7 @@ defmodule Authable.Factory do
   def factory(:user) do
     %@resource_owner{
       email: sequence(:email, &"email-#{&1}@example.com"),
-      password: Comeonin.Bcrypt.hashpwsalt("12345678")
+      password: Bcrypt.hash_pwd_salt("12345678")
     }
   end
 
