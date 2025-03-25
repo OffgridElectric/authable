@@ -36,7 +36,7 @@ defmodule Authable.Factory do
       user: build(:user),
       name: "session_token",
       value: "st1234567890",
-      expires_at: Timex.Time.now(:seconds) + 3600
+      expires_at: Timex.now(:seconds) + 3600
     })
   end
 
@@ -45,7 +45,7 @@ defmodule Authable.Factory do
       user: build(:user),
       name: "access_token",
       value: "at1234567890",
-      expires_at: Timex.Time.now(:seconds) + 3600,
+      expires_at: Timex.now(:seconds) + 3600,
       details: %{
         scope: "read",
         grant_type: "authorization_code",
@@ -59,7 +59,7 @@ defmodule Authable.Factory do
       user_id: build(:user),
       name: "refresh_token",
       value: "rt1234567890",
-      expires_at: Timex.Time.now(:seconds) + 3600,
+      expires_at: Timex.now(:seconds) + 3600,
       details: %{
         grant_type: "authorization_code",
         client_id: build(:client).id,
@@ -73,7 +73,7 @@ defmodule Authable.Factory do
       user_id: build(:user),
       name: "authorization_code",
       value: "a0123456789c",
-      expires_at: Timex.Time.now(:seconds) + 900,
+      expires_at: Timex.now(:seconds) + 900,
       details: %{
         scope: "read",
         grant_type: "password",
