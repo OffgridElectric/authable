@@ -8,7 +8,7 @@ defmodule Authable.Repo.Migrations.CreateApp do
       add(:user_id, references(:users, on_delete: :delete_all, type: :uuid))
       add(:client_id, references(:clients, on_delete: :delete_all, type: :uuid))
 
-      timestamps
+      timestamps()
     end
 
     create(unique_index(:apps, [:user_id, :client_id]))

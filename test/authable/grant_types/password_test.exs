@@ -1,14 +1,14 @@
-defmodule Authable.GrantTypes.PasswordTest do
+defmodule Authable.GrantType.PasswordTest do
   use ExUnit.Case
   use Authable.Rollbackable
-  use Authable.RepoCase
+  use Authable.RepoBase
   import Authable.Factory
-  alias Authable.GrantTypes.Password, as: PasswordGrantType
+  alias Authable.GrantType.Password, as: PasswordGrantType
 
   setup do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id)
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id)
 
     params = %{
       "email" => resource_owner.email,

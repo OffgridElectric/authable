@@ -1,4 +1,4 @@
-import Config
+use Mix.Config
 
 config :authable, Authable.Repo,
   adapter: Ecto.Adapters.Postgres,
@@ -7,3 +7,7 @@ config :authable, Authable.Repo,
   database: "authable_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :authable, app_authorization: Authable.Stub.AppAuthorization
+
+config :logger, level: :warn

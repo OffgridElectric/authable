@@ -1,22 +1,34 @@
-defmodule Authable.GrantTypes.AuthorizationCodeTest do
+defmodule Authable.GrantType.AuthorizationCodeTest do
+  import Authable.Config, only: [repo: 0]
   use ExUnit.Case
   use Authable.Rollbackable
-  use Authable.RepoCase
+  use Authable.RepoBase
   import Authable.Factory
-  alias Authable.GrantTypes.AuthorizationCode, as: AuthorizationCodeGrantType
+  alias Authable.GrantType.AuthorizationCode, as: AuthorizationCodeGrantType
 
   @scopes "read"
 
   setup do
-    resource_owner = create(:user)
-    client_owner = create(:user)
-    client = create(:client, user_id: client_owner.id)
-    create(:app, scope: @scopes, user_id: resource_owner.id, client_id: client.id)
+    resource_owner = insert(:user)
+    client_owner = insert(:user)
+    client = insert(:client, user_id: client_owner.id)
+
+    insert(
+      :app,
+      scope: @scopes,
+      user_id: resource_owner.id,
+      client_id: client.id
+    )
 
     token =
-      create(:authorization_code,
+      insert(
+        :authorization_code,
         user_id: resource_owner.id,
-        details: %{client_id: client.id, redirect_uri: client.redirect_uri, scope: @scopes}
+        details: %{
+          client_id: client.id,
+          redirect_uri: client.redirect_uri,
+          scope: @scopes
+        }
       )
 
     params = %{
@@ -29,21 +41,25 @@ defmodule Authable.GrantTypes.AuthorizationCodeTest do
     {:ok, [params: params, user_id: resource_owner.id]}
   end
 
-  test "oauth2 authorization with authorization_code grant type", %{params: params} do
+  test "oauth2 authorization with authorization_code grant type", %{
+    params: params
+  } do
     access_token = AuthorizationCodeGrantType.authorize(params)
     refute is_nil(access_token)
     assert access_token.details[:grant_type] == "authorization_code"
   end
 
-  test "oauth2 authorization with authorization_code auto creates app", %{params: params} do
+  test "oauth2 authorization with authorization_code auto inserts app", %{
+    params: params
+  } do
     AuthorizationCodeGrantType.authorize(params)
-    assert Enum.count(@repo.all(@app)) > 0
+    assert Enum.count(repo().all(@app)) > 0
   end
 
-  test "can not create access_token more than one with a token with same authorization_code params",
+  test "can not insert access_token more than one with a token with same authorization_code params",
        %{params: params} do
     AuthorizationCodeGrantType.authorize(params)
-    second_token = AuthorizationCodeGrantType.authorize(params)
-    assert is_nil(second_token)
+    {:error, _, http_status} = AuthorizationCodeGrantType.authorize(params)
+    assert http_status == :unauthorized
   end
 end

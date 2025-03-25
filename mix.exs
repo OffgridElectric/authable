@@ -4,15 +4,18 @@ defmodule Authable.Mixfile do
   def project do
     [
       app: :authable,
-      version: "0.4.0",
-      elixir: "~> 1.2",
+      version: "0.11.0",
+      elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       description: description(),
       package: package(),
-      deps: deps()
+      deps: deps(),
+      docs: [extras: ["README.md"]],
+      dialyzer: [plt_add_deps: :transitive],
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -21,9 +24,14 @@ defmodule Authable.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      mod: {Authable, []},
-      applications: [:logger, :comeonin, :ecto, :timex, :secure_random],
-      extra_applications: [:logger, :ecto_sql]
+      extra_applications: [
+        :logger,
+        :crypto,
+        :bcrypt_elixir,
+        :ecto,
+        :postgrex,
+        :plug
+      ]
     ]
   end
 
@@ -38,27 +46,33 @@ defmodule Authable.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:postgrex, ">= 0.0.0"},
-      {:ecto_sql, "~> 3.12"},
-      {:ecto, ">= 1.1.7"},
-      {:bcrypt_elixir, "~> 2.3"},
-      {:comeonin, "~> 5.3"},
-      {:timex, "~> 3.6"},
-      {:secure_random, "~> 0.2"},
-      {:ex_machina, "~> 0.6.1", only: :test},
-      {:poison, "~> 2.1.0"},
-      {:credo, "~> 0.4", only: [:dev, :test]},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:postgrex, "~> 0.15"},
+      {:ecto_sql, "~> 3.0"},
+      {:ecto, "~> 3.0"},
+      {:bcrypt_elixir, "~> 2.0"},
+      {:plug, ">= 1.0.0"},
+      {:jason, "~> 1.2"},
+      {:ex_machina, ">= 2.2.0", only: :test},
+      {:credo, ">= 0.10.2", only: [:dev, :test]},
+      {:ex_doc, ">= 0.19.1", only: :dev},
+      {:dialyxir, ">= 0.5.1", only: [:dev], runtime: false},
+      {:excoveralls, ">= 0.10.1", only: :test}
     ]
   end
 
-  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
-  defp elixirc_paths(_), do: ["lib", "web"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp aliases do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"]
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: [
+        "ecto.drop -r Authable.Repo --quiet",
+        "ecto.create -r Authable.Repo --quiet",
+        "ecto.migrate -r Authable.Repo --quiet",
+        "test"
+      ]
     ]
   end
 
@@ -72,7 +86,7 @@ defmodule Authable.Mixfile do
   defp package do
     [
       name: :authable,
-      files: ["lib", "web", "priv", "mix.exs", "README.md"],
+      files: ["lib", "priv", "mix.exs", "README.md"],
       maintainers: ["Mustafa Turan"],
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/mustafaturan/authable"}

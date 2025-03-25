@@ -1,15 +1,63 @@
-defmodule Authable.Authentications.Bearer do
+defmodule Authable.Authentication.Bearer do
   @moduledoc """
-  Bearer Authentication authenticate
+  Bearer authentication helper module, implements Authable.Authentication
+  behaviour.
   """
 
-  alias Authable.Authentications.Token, as: TokenAuthentication
+  alias Authable.Authentication.Token, as: TokenAuthentication
 
-  def authenticate(%{"access_token" => access_token}) do
-    authenticate(access_token)
+  @behaviour Authable.Authentication
+
+  @doc """
+  Authenticates resource-owner using access_token map.
+
+  It reads access_token value from given input and delegates value to
+  Authable.Authentication.Bearer.authenticate/1 function.
+
+  ## Examples
+
+      # Suppose we have a access_token at 'token store(Authable.Token)'
+      # with token value "at123456789"
+      # If we pass the token value to the function,
+      # it will return resource-owner.
+      Authable.Authentication.Bearer.authenticate(
+       %{"access_token" => "at123456789"}, ["read"])
+      # or
+      Authable.Authentication.Bearer.authenticate("at123456789", ["read"])
+      # or
+      Authable.Authentication.Bearer.authenticate("Bearer at123456789",
+        ["read"])
+  """
+  def authenticate(%{"access_token" => access_token}, required_scopes),
+    do: authenticate(access_token, required_scopes)
+
+  def authenticate("Bearer " <> access_token, required_scopes),
+    do: authenticate(access_token, required_scopes)
+
+  def authenticate(access_token, required_scopes) do
+    case TokenAuthentication.authenticate(
+           {"access_token", access_token},
+           required_scopes
+         ) do
+      {:ok, user} ->
+        {:ok, user}
+
+      {:error, errors, status} ->
+        {:error, Map.put(errors, :headers, error_headers(errors)), status}
+    end
   end
 
-  def authenticate(access_token) do
-    TokenAuthentication.authenticate("access_token", access_token)
+  defp error_headers(errors) do
+    error_message = generate_error_header_message(errors)
+    [%{"www-authenticate" => "Bearer realm=\"authable\", #{error_message}"}]
+  end
+
+  defp generate_error_header_message(errors) do
+    {error, error_message} =
+      errors
+      |> Map.to_list()
+      |> List.first()
+
+    "error=\"#{error}\", error_description=\"#{error_message}\""
   end
 end

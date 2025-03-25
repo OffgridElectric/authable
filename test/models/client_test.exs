@@ -1,15 +1,15 @@
-defmodule Authable.Models.ClientTest do
+defmodule Authable.Model.ClientTest do
   use Authable.ModelCase
   import Authable.Factory
 
   setup do
-    client_owner = create(:user)
+    client_owner = insert(:user)
     {:ok, [user_id: client_owner.id]}
   end
 
   test "changeset with valid attributes", %{user_id: user_id} do
     changeset =
-      @client.changeset(struct(@client), %{
+      @client.changeset(%@client{}, %{
         user_id: user_id,
         name: "ResourceServer",
         redirect_uri: "https://example.com/oauth2_callback",

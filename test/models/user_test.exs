@@ -1,23 +1,27 @@
-defmodule Authable.Models.UserTest do
+defmodule Authable.Model.UserTest do
   use Authable.ModelCase
 
-  @valid_attrs %{email: "foo@example.com", password: "s3cr3tX.", settings: %{}}
+  @valid_attrs %{
+    email: "foo@example.com",
+    password: "s3cr3tX.",
+    settings: %{locale: "en"}
+  }
   @invalid_attrs %{}
 
   test "changeset with valid attributes" do
-    changeset = @resource_owner.changeset(struct(@resource_owner), @valid_attrs)
+    changeset = @resource_owner.changeset(%@resource_owner{}, @valid_attrs)
     assert changeset.valid?
   end
 
   test "changeset with invalid attributes" do
-    changeset = @resource_owner.changeset(struct(@resource_owner), @invalid_attrs)
+    changeset = @resource_owner.changeset(%@resource_owner{}, @invalid_attrs)
     refute changeset.valid?
   end
 
   test "changeset, email too short" do
     changeset =
       @resource_owner.changeset(
-        struct(@resource_owner),
+        %@resource_owner{},
         Map.put(@valid_attrs, :email, "")
       )
 
@@ -27,7 +31,7 @@ defmodule Authable.Models.UserTest do
   test "changeset, email invalid format" do
     changeset =
       @resource_owner.changeset(
-        struct(@resource_owner),
+        %@resource_owner{},
         Map.put(@valid_attrs, :email, "foo.com")
       )
 
@@ -35,14 +39,17 @@ defmodule Authable.Models.UserTest do
   end
 
   test "registration_changeset, encrypt password" do
-    changeset = @resource_owner.registration_changeset(struct(@resource_owner), @valid_attrs)
+    changeset =
+      @resource_owner.registration_changeset(%@resource_owner{}, @valid_attrs)
+
     assert changeset.changes.password
+    assert changeset.changes.settings
   end
 
   test "registration_changeset, password too short" do
     changeset =
       @resource_owner.registration_changeset(
-        struct(@resource_owner),
+        %@resource_owner{},
         Map.put(@valid_attrs, :password, "1234567")
       )
 
@@ -51,11 +58,28 @@ defmodule Authable.Models.UserTest do
 
   test "settings_changeset with valid attributes" do
     changeset =
-      @resource_owner.settings_changeset(
-        struct(@resource_owner),
-        %{settings: %{language: "tr"}}
-      )
+      @resource_owner.settings_changeset(%@resource_owner{}, %{
+        settings: %{language: "tr"}
+      })
 
     assert changeset.valid?
+  end
+
+  test "password_changeset with valid attributes" do
+    changeset =
+      @resource_owner.password_changeset(%@resource_owner{}, %{
+        password: "1A2bCx.y"
+      })
+
+    assert changeset.valid?
+  end
+
+  test "password_changeset, password too short" do
+    changeset =
+      @resource_owner.password_changeset(%@resource_owner{}, %{
+        password: "1A23567"
+      })
+
+    refute changeset.valid?
   end
 end

@@ -17,7 +17,7 @@ defmodule Authable.ModelCase do
   using do
     quote do
       use Authable.Rollbackable
-      use Authable.RepoCase
+      use Authable.RepoBase
       import Ecto
       import Ecto.Changeset
       import Ecto.Query, only: [from: 1, from: 2]

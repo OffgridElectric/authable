@@ -4,22 +4,22 @@ defmodule Authable.Rollbackable do
   """
 
   use ExUnit.CaseTemplate
-
-  @repo Application.compile_env!(:authable, :repo)
+  import Authable.Config, only: [repo: 0]
 
   using do
     quote do
     end
   end
 
-  setup do
-    # Wrap this case in a transaction
-    Ecto.Adapters.SQL.begin_test_transaction(@repo)
+  setup tags do
+    case Ecto.Adapters.SQL.Sandbox.checkout(repo()) do
+      :ok -> true
+      {:already, :owner} -> true
+    end
 
-    # Roll it back once we are done
-    on_exit(fn ->
-      Ecto.Adapters.SQL.rollback_test_transaction(@repo)
-    end)
+    unless tags[:async] do
+      Ecto.Adapters.SQL.Sandbox.mode(repo(), {:shared, self()})
+    end
 
     :ok
   end

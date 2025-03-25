@@ -10,7 +10,7 @@ defmodule Authable.Repo.Migrations.CreateToken do
       add(:details, :jsonb)
       add(:user_id, references(:users, on_delete: :delete_all, type: :uuid))
 
-      timestamps
+      timestamps()
     end
 
     create(index(:tokens, [:user_id]))
